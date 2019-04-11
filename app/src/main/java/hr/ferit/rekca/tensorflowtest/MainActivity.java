@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
     ImageView imageView;
     TextView textView;
     Button switchActivity;
-
+    Button switchToDatabase;
     private ByteBuffer imgData = null;
 
     private static String TAG = "ScreenOne";
@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
     float guessedActivation;
 
     Intent intent;
+    Intent intentDatabase;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -78,6 +79,11 @@ public class MainActivity extends AppCompatActivity {
         switchActivity.setEnabled(false);
         intent = new Intent(this, CameraActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+
+        switchToDatabase = findViewById(R.id.btnDatabase);
+        intentDatabase = new Intent(this, DatabaseActivity.class);
+        intentDatabase.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+
 
         initBtnListeners();
 
@@ -115,6 +121,18 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
+            }
+        });
+
+        switchToDatabase.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try{
+                    startActivity(intentDatabase);
+                }
+                catch (Exception e){
+                    e.printStackTrace();
+                }
             }
         });
     }
