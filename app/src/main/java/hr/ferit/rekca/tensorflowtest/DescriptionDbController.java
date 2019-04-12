@@ -11,9 +11,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DescriptionDbController {
-    static String TAG = "kekkek";
-    SQLiteDatabase db;
-    DescriptionDbHelper dbHelper;
+    private String TAG = "kekkek";
+    private SQLiteDatabase db;
+    private DescriptionDbHelper dbHelper;
+
+    public enum Mode {UPDATE_COUNTER, UPDATE_PICTURE, UPDATE_FULL }
+
     public DescriptionDbController(Context context){
         dbHelper = new DescriptionDbHelper(context);
     }
@@ -33,15 +36,8 @@ public class DescriptionDbController {
     public long insertRow(DescriptionDbSingleUnit input){
         openDbForWrite();
 
-        ContentValues values = new ContentValues();
-        values.put(DescriptionContract.DescriptionEntry.COLUMN_NAME_NAME, input.getName());
-        values.put(DescriptionContract.DescriptionEntry.COLUMN_NAME_INFO, input.getInfo());
-        values.put(DescriptionContract.DescriptionEntry.COLUMN_NAME_PICTURE, input.getPicture());
-        values.put(DescriptionContract.DescriptionEntry.COLUMN_NAME_GUESS, input.getGuess());
-        values.put(DescriptionContract.DescriptionEntry.COLUMN_NAME_GUESS_COUNT, input.getGuessCount());
-        values.put(DescriptionContract.DescriptionEntry.COLUMN_NAME_LAST_SEEN, input.getLastSeen());
+        long newRowId = db.insert(DescriptionContract.DescriptionEntry.TABLE_NAME, null, InputToContentVal(input, Mode.UPDATE_FULL));
 
-        long newRowId = db.insert(DescriptionContract.DescriptionEntry.TABLE_NAME, null, values);
         Log.d(TAG, "onCreate: " + String.valueOf(newRowId));
 
         closeDb();
@@ -49,14 +45,11 @@ public class DescriptionDbController {
     }
 
     public List<DescriptionDbSingleUnit> readAll(){
-        return readDb("*");
+        return readDb("%");
     }
 
     public List<DescriptionDbSingleUnit> readDb(String searchName){
         openDbForRead();
-
-        List<DescriptionDbSingleUnit> outputRows = new ArrayList<>();
-
 
         String[] projection = {
                 BaseColumns._ID,
@@ -68,7 +61,7 @@ public class DescriptionDbController {
                 DescriptionContract.DescriptionEntry.COLUMN_NAME_LAST_SEEN
         };
 
-        String selection = DescriptionContract.DescriptionEntry.COLUMN_NAME_NAME + " = ?";
+        String selection = DescriptionContract.DescriptionEntry.COLUMN_NAME_NAME + " LIKE ?";
         String[] selectionArgs = {searchName};
 
         String sortOrder = DescriptionContract.DescriptionEntry.COLUMN_NAME_NAME + " ASC";
@@ -82,6 +75,8 @@ public class DescriptionDbController {
                 null,
                 sortOrder
         );
+
+        List<DescriptionDbSingleUnit> outputRows = new ArrayList<>();
 
         while(cursor.moveToNext()) {
             long itemId = cursor.getLong(cursor.getColumnIndexOrThrow(DescriptionContract.DescriptionEntry._ID));
@@ -104,7 +99,42 @@ public class DescriptionDbController {
         closeDb();
         return outputRows;
     }
+
+    public void updateRow(DescriptionDbSingleUnit inputRow, Mode mode){
+        db = dbHelper.getWritableDatabase();
+
+        String selection = DescriptionContract.DescriptionEntry.COLUMN_NAME_NAME + " LIKE ?";
+        String[] selectionArgs = { inputRow.getName() };
+
+        ContentValues values = InputToContentVal(inputRow, mode);
+
+        db.update(
+            DescriptionContract.DescriptionEntry.TABLE_NAME,
+            values,
+            selection,
+            selectionArgs);
+
+    }
+
+    private ContentValues InputToContentVal(DescriptionDbSingleUnit input, Mode mode){
+        ContentValues values = new ContentValues();
+
+        values.put(DescriptionContract.DescriptionEntry.COLUMN_NAME_GUESS_COUNT, input.getGuessCount());
+        values.put(DescriptionContract.DescriptionEntry.COLUMN_NAME_LAST_SEEN, input.getLastSeen());
+
+        if(mode == Mode.UPDATE_PICTURE || mode == Mode.UPDATE_FULL){
+            values.put(DescriptionContract.DescriptionEntry.COLUMN_NAME_PICTURE, input.getPicture());
+            values.put(DescriptionContract.DescriptionEntry.COLUMN_NAME_GUESS, input.getGuess());
+        }
+        if(mode == Mode.UPDATE_FULL){
+            values.put(DescriptionContract.DescriptionEntry.COLUMN_NAME_NAME, input.getName());
+            values.put(DescriptionContract.DescriptionEntry.COLUMN_NAME_INFO, input.getInfo());
+        }
+
+        return values;
+    }
+
+
 }
 
-//TODO: Make a DescriptionDbUpdateManager, which will determine when the db data is updated with new ones. It will use this class for reading and writing.
-//TODO: Make options for updating and deleting data, right now there is only add row and read row
+//TODO: Make a method that will initialize the database with names and infos of all animal classes. You have labels for names, infos will be in a seperate file. (or in strings file)

@@ -3,6 +3,8 @@ package hr.ferit.rekca.tensorflowtest;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.icu.text.SimpleDateFormat;
+import android.icu.util.Calendar;
 import android.os.AsyncTask;
 import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
@@ -25,9 +27,12 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+
+    //TODO: Clean this code, put in an another class
 
     ImageView imageView;
     TextView textView;
@@ -103,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         Log.d(TAG, "onResume: check");
+        //TODO: make it not run when back button is pressed, and only when the picture is taken
         classifier();
 
 
@@ -167,6 +173,7 @@ public class MainActivity extends AppCompatActivity {
         new GetImageTask().execute();
 
 
+
     }
 
 
@@ -194,7 +201,23 @@ public class MainActivity extends AppCompatActivity {
             super.onPostExecute(aVoid);
             displayResults();
             switchActivity.setEnabled(true);
+
+            updateDb();
         }
+    }
+
+    private void updateDb() {
+        DescriptionDbUpdateManager manager = new DescriptionDbUpdateManager(this);
+
+        Date c = Calendar.getInstance().getTime();
+
+        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+        String formattedDate = df.format(c);
+
+        DescriptionDbSingleUnit tempUnit = new DescriptionDbSingleUnit(labels.get(guessedLabel), null, null, guessedActivation, 0, formattedDate);
+        //TODO: make a factory class to unfuck this
+
+        manager.UpdateRow(tempUnit);
     }
 
     class GetImageTask extends AsyncTask<Void, Void, Void>{

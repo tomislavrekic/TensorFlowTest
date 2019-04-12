@@ -17,6 +17,30 @@ public class DescriptionDbSingleUnit {
         this.lastSeen = lastSeen;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setInfo(String info) {
+        this.info = info;
+    }
+
+    public void setPicture(byte[] picture) {
+        this.picture = picture;
+    }
+
+    public void setGuess(float guess) {
+        this.guess = guess;
+    }
+
+    public void setGuessCount(int guessCount) {
+        this.guessCount = guessCount;
+    }
+
+    public void setLastSeen(String lastSeen) {
+        this.lastSeen = lastSeen;
+    }
+
     public String getName() {
         return name;
     }

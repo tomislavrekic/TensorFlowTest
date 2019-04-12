@@ -36,6 +36,8 @@ import java.util.Collections;
 
 public class CameraActivity extends AppCompatActivity {
 
+    //TODO: Clean this code, put it an another class
+
     static String TAG = "Davidgay";
 
     static int lowestCamResolution = 400;
