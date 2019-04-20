@@ -1,4 +1,4 @@
-package hr.ferit.rekca.tensorflowtest;
+package hr.ferit.rekca.tensorflowtest.DescriptionDb;
 
 import android.provider.BaseColumns;
 

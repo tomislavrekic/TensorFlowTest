@@ -1,14 +1,14 @@
-package hr.ferit.rekca.tensorflowtest;
+package hr.ferit.rekca.tensorflowtest.DescriptionDb;
 
 public class DescriptionDbSingleUnit {
     private String name;
     private String info;
-    private byte[] picture;
+    private String picture;
     private float guess;
     private int guessCount;
     private String lastSeen;
 
-    public DescriptionDbSingleUnit(String name, String info, byte[] picture, float guess, int guessCount, String lastSeen) {
+    public DescriptionDbSingleUnit(String name, String info, String  picture, float guess, int guessCount, String lastSeen) {
         this.name = name;
         this.info = info;
         this.picture = picture;
@@ -25,7 +25,7 @@ public class DescriptionDbSingleUnit {
         this.info = info;
     }
 
-    public void setPicture(byte[] picture) {
+    public void setPicture(String picture) {
         this.picture = picture;
     }
 
@@ -49,7 +49,7 @@ public class DescriptionDbSingleUnit {
         return info;
     }
 
-    public byte[] getPicture() {
+    public String getPicture() {
         return picture;
     }
 

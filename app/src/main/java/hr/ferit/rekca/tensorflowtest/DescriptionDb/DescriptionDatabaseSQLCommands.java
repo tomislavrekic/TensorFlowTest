@@ -1,7 +1,7 @@
-package hr.ferit.rekca.tensorflowtest;
+package hr.ferit.rekca.tensorflowtest.DescriptionDb;
 
 
-import static hr.ferit.rekca.tensorflowtest.DescriptionContract.DescriptionEntry;
+import static hr.ferit.rekca.tensorflowtest.DescriptionDb.DescriptionContract.DescriptionEntry;
 
 public final class DescriptionDatabaseSQLCommands {
     public static final String SQL_CREATE_ENTRIES =
@@ -9,7 +9,7 @@ public final class DescriptionDatabaseSQLCommands {
             DescriptionEntry._ID + " INTEGER PRIMARY KEY," +
             DescriptionEntry.COLUMN_NAME_NAME + " VARCHAR(25), " +
             DescriptionEntry.COLUMN_NAME_INFO + " TEXT, " +
-            DescriptionEntry.COLUMN_NAME_PICTURE + " BLOB," +
+            DescriptionEntry.COLUMN_NAME_PICTURE + " VARCHAR(50)," +
             DescriptionEntry.COLUMN_NAME_GUESS + " FLOAT, " +
             DescriptionEntry.COLUMN_NAME_GUESS_COUNT + " INTEGER, " +
             DescriptionEntry.COLUMN_NAME_LAST_SEEN + " DATE)";

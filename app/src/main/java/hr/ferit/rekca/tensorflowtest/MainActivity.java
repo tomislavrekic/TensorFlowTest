@@ -1,5 +1,6 @@
 package hr.ferit.rekca.tensorflowtest;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -18,7 +19,10 @@ import android.widget.TextView;
 import org.tensorflow.lite.Interpreter;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,6 +33,9 @@ import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import hr.ferit.rekca.tensorflowtest.DescriptionDb.DescriptionDbSingleUnit;
+import hr.ferit.rekca.tensorflowtest.DescriptionDb.DescriptionDbUpdateManager;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -61,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
     float[][] output = null;
 
     Interpreter tflite;
+
 
     Bitmap inputImage;
 
@@ -214,10 +222,29 @@ public class MainActivity extends AppCompatActivity {
         SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
         String formattedDate = df.format(c);
 
-        DescriptionDbSingleUnit tempUnit = new DescriptionDbSingleUnit(labels.get(guessedLabel), null, null, guessedActivation, 0, formattedDate);
-        //TODO: make a factory class to unfuck this
+
+
+        DescriptionDbSingleUnit tempUnit = new DescriptionDbSingleUnit(labels.get(guessedLabel), null, createImageFromBitmapDB(inputImage), guessedActivation, 0, formattedDate);
+        //TODO: make a factory class to unfuck this and to decide if the pic gets replaced
 
         manager.UpdateRow(tempUnit);
+    }
+
+    public String createImageFromBitmapDB(Bitmap bitmap) {
+        String fileName = "tempNameFile";//no .png or .jpg needed
+        try {
+            Bitmap.createScaledBitmap(bitmap, 100, 100, true);
+            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+            FileOutputStream fo = openFileOutput(fileName, Context.MODE_PRIVATE);
+            fo.write(bytes.toByteArray());
+            // remember close file output
+            fo.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            fileName = null;
+        }
+        return fileName;
     }
 
     class GetImageTask extends AsyncTask<Void, Void, Void>{
@@ -269,6 +296,7 @@ public class MainActivity extends AppCompatActivity {
 
         try{
             bitmap = BitmapFactory.decodeStream(this.openFileInput("TensorFlowTestImage"));
+            //TODO: could scale the image before saving it
             return Bitmap.createScaledBitmap(bitmap,DIM_IMG_SIZE_X,DIM_IMG_SIZE_Y, true);
 
         }
@@ -278,6 +306,7 @@ public class MainActivity extends AppCompatActivity {
 
         return null;
     }
+
 
     @Override
     protected void onStop() {

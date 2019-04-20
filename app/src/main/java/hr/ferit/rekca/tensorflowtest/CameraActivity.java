@@ -42,6 +42,10 @@ public class CameraActivity extends AppCompatActivity {
 
     static int lowestCamResolution = 400;
 
+    static final int DIM_IMG_SIZE_X = 224;
+    static final int DIM_IMG_SIZE_Y = 224;
+
+
     int cameraFacing;
     CameraManager cameraManager;
     TextureView.SurfaceTextureListener surfaceTextureListener;

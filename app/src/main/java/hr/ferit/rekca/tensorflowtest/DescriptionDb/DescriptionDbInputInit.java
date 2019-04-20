@@ -1,7 +1,6 @@
-package hr.ferit.rekca.tensorflowtest;
+package hr.ferit.rekca.tensorflowtest.DescriptionDb;
 
 import android.content.Context;
-import android.print.PrinterId;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -45,7 +44,7 @@ public final class DescriptionDbInputInit {
         List<String> descs = initDesc(context);
 
         for(int i=0; i<labels.size();i++){
-            DescriptionDbSingleUnit tempUnit = new DescriptionDbSingleUnit(labels.get(i), descs.get(i), null, 0.0f, 0, "01/01/1000" );
+            DescriptionDbSingleUnit tempUnit = new DescriptionDbSingleUnit(labels.get(i), descs.get(i), "", 0.0f, 0, "01/01/1000" );
             //TODO: make an "empty" picture for init
 
             tempController.insertRow(tempUnit);

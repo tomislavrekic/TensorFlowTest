@@ -1,4 +1,4 @@
-package hr.ferit.rekca.tensorflowtest;
+package hr.ferit.rekca.tensorflowtest.DescriptionDb;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -82,7 +82,7 @@ public class DescriptionDbController {
             long itemId = cursor.getLong(cursor.getColumnIndexOrThrow(DescriptionContract.DescriptionEntry._ID));
             String tempName = cursor.getString(cursor.getColumnIndexOrThrow(DescriptionContract.DescriptionEntry.COLUMN_NAME_NAME));
             String tempInfo = cursor.getString(cursor.getColumnIndexOrThrow(DescriptionContract.DescriptionEntry.COLUMN_NAME_INFO));
-            byte[] tempPicture = cursor.getBlob(cursor.getColumnIndexOrThrow(DescriptionContract.DescriptionEntry.COLUMN_NAME_PICTURE));
+            String tempPicture = cursor.getString(cursor.getColumnIndexOrThrow(DescriptionContract.DescriptionEntry.COLUMN_NAME_PICTURE));
             Float tempGuess = cursor.getFloat(cursor.getColumnIndexOrThrow(DescriptionContract.DescriptionEntry.COLUMN_NAME_GUESS));
             Integer tempGuessCount = cursor.getInt(cursor.getColumnIndexOrThrow(DescriptionContract.DescriptionEntry.COLUMN_NAME_GUESS_COUNT));
             String tempDate = cursor.getString(cursor.getColumnIndexOrThrow(DescriptionContract.DescriptionEntry.COLUMN_NAME_LAST_SEEN));
