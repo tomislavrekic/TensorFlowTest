@@ -16,20 +16,12 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import org.tensorflow.lite.Interpreter;
-
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -43,40 +35,18 @@ public class MainActivity extends AppCompatActivity {
 
     ImageView imageView;
     TextView textView;
-    Button switchActivity;
+    Button switchToCamera;
     Button switchToDatabase;
-    private ByteBuffer imgData = null;
 
     private static String TAG = "ScreenOne";
 
-    private static final int DIM_BATCH_SIZE = 1;
-
-    private static final int DIM_PIXEL_SIZE = 3;
-
-    static final int DIM_IMG_SIZE_X = 224;
-    static final int DIM_IMG_SIZE_Y = 224;
-
-    private static final int IMAGE_MEAN = 128;
-    private static final float IMAGE_STD = 128.0f;
-
-    private static final String MODEL_PATH = "Mobile2.tflite";
-
     private List<String> labels;
-
-    private int[] intValues;
-
-    float[][] output = null;
-
-    Interpreter tflite;
-
-
-    Bitmap inputImage;
-
-    int guessedLabel;
-    float guessedActivation;
 
     Intent intent;
     Intent intentDatabase;
+
+    Bitmap inputImage;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -88,22 +58,21 @@ public class MainActivity extends AppCompatActivity {
 
         imageView = findViewById(R.id.ivPreview);
         textView = findViewById(R.id.tvGuess);
-        switchActivity = findViewById(R.id.btnSwitch);
-        switchActivity.setEnabled(false);
+        switchToDatabase = findViewById(R.id.btnDatabase);
+        switchToCamera = findViewById(R.id.btnSwitch);
+        switchToCamera.setEnabled(false);
+
         intent = new Intent(this, CameraActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 
-        switchToDatabase = findViewById(R.id.btnDatabase);
+
+
         intentDatabase = new Intent(this, DatabaseActivity.class);
         intentDatabase.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 
-
         initBtnListeners();
 
-
         initLabels();
-        initModel();
-        initializeVariables();
 
         long endTime = SystemClock.elapsedRealtime();
         long elapsedTime = endTime - startTime;
@@ -115,20 +84,20 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
         Log.d(TAG, "onResume: check");
         //TODO: make it not run when back button is pressed, and only when the picture is taken
         classifier();
 
-
     }
 
     private void initBtnListeners() {
-        switchActivity.setOnClickListener(new View.OnClickListener() {
+        switchToCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 try {
-                    switchActivity.setEnabled(false);
+                    switchToCamera.setEnabled(false);
                     startActivityIfNeeded(intent,0);
                 }
                 catch (Exception e){
@@ -151,17 +120,9 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void initModel() {
-        try {
-            tflite = new Interpreter(getModelFile());
-        }
-        catch (IOException e){
-            e.printStackTrace();
-        }
-    }
 
     private void initLabels() {
-        labels = new ArrayList<String>();
+        labels = new ArrayList<>();
         try{
             BufferedReader reader = new BufferedReader(new InputStreamReader(this.getAssets().open("labels.txt")));
             String line;
@@ -174,47 +135,28 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
-
     public void classifier(){
-
-        new GetImageTask().execute();
-
-
-
+        inputImage = GetImage();
+        displayImage(inputImage);
+        displayLoading();
+        temptemp();
+        switchToCamera.setEnabled(true);
     }
 
 
-    class RunNeuralNetworkTask extends AsyncTask<Void, Void,Void>{
 
-        @Override
-        protected Void doInBackground(Void... voids) {
-            if(inputImage==null){
-                return null;
+    private void temptemp(){
+        Classifier temp = new Classifier(Constants.TF_MODEL_PATH,Constants.TF_LABEL_PATH, getBaseContext());
+        temp.Classify(new ClassifierResponse() {
+            @Override
+            public void processFinished(int guessedLabelIndex, float guessedActivation) {
+                Log.d("CLS", "onPostExecute: " + String.valueOf(guessedLabelIndex) + "   "  + String.valueOf(guessedActivation));
+                displayResults(guessedLabelIndex, guessedActivation);
             }
-
-            convertBitmapToByteBuffer(inputImage);
-
-            tflite.run(imgData, output);
-
-            guessedLabel = processLabelProb();
-
-            Log.d("result",labels.get(guessedLabel));
-            Log.d("result",String.valueOf(output[0][guessedLabel]));
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            displayResults();
-            switchActivity.setEnabled(true);
-
-            updateDb();
-        }
+        });
     }
 
-    private void updateDb() {
+    private void updateDb(int guessedLabelIndex, float guessedActivation) {
         DescriptionDbUpdateManager manager = new DescriptionDbUpdateManager(this);
 
         Date c = Calendar.getInstance().getTime();
@@ -224,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        DescriptionDbSingleUnit tempUnit = new DescriptionDbSingleUnit(labels.get(guessedLabel), null, createImageFromBitmapDB(inputImage), guessedActivation, 0, formattedDate);
+        DescriptionDbSingleUnit tempUnit = new DescriptionDbSingleUnit(labels.get(guessedLabelIndex), null, createImageFromBitmapDB(inputImage), guessedActivation, 0, formattedDate);
         //TODO: make a factory class to unfuck this and to decide if the pic gets replaced
 
         manager.UpdateRow(tempUnit);
@@ -247,57 +189,27 @@ public class MainActivity extends AppCompatActivity {
         return fileName;
     }
 
-    class GetImageTask extends AsyncTask<Void, Void, Void>{
 
-        @Override
-        protected Void doInBackground(Void... voids) {
-            inputImage = GetImage();
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            displayImage();
-
-            displayLoading();
-
-
-            new RunNeuralNetworkTask().execute();
-        }
-    }
-
-    private void displayImage() {
-        imageView.setImageBitmap(inputImage);
+    private void displayImage(Bitmap image) {
+        imageView.setImageBitmap(image);
     }
 
     private void displayLoading() {
         textView.setText("Calculating...");
     }
 
-    private int processLabelProb() {
-        guessedLabel = 0;
-        for(int i=1; i<labels.size();i++){
-            if(output[0][i]>output[0][guessedLabel]){
-                guessedLabel = i;
-            }
-        }
-        guessedActivation = output[0][guessedLabel];
-        return guessedLabel;
-    }
 
-    private void displayResults() {
-        textView.setText("Guessed: " + labels.get(guessedLabel) + "\n" + String.valueOf(guessedActivation));
+    private void displayResults(int guessedLabelIndex, Float guessedActivation) {
+        textView.setText("Guessed: " + labels.get(guessedLabelIndex) + "\n" + String.valueOf(guessedActivation));
     }
 
     private Bitmap GetImage() {
         Bitmap bitmap = null;
 
         try{
-            bitmap = BitmapFactory.decodeStream(this.openFileInput("TensorFlowTestImage"));
+            bitmap = BitmapFactory.decodeStream(this.openFileInput(Constants.TEMP_IMAGE_KEY));
             //TODO: could scale the image before saving it
-            return Bitmap.createScaledBitmap(bitmap,DIM_IMG_SIZE_X,DIM_IMG_SIZE_Y, true);
+            return Bitmap.createScaledBitmap(bitmap,Constants.DIM_IMG_SIZE_X,Constants.DIM_IMG_SIZE_Y, true);
 
         }
         catch (IOException e){
@@ -321,7 +233,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... voids) {
             File dir = getFilesDir();
-            File file = new File(dir,"TensorFlowTestImage");
+            File file = new File(dir,Constants.TEMP_IMAGE_KEY);
             if (!file.exists()){
                 return null;
             }
@@ -329,53 +241,5 @@ public class MainActivity extends AppCompatActivity {
             return null;
         }
     }
-
-
-    private void initializeVariables() {
-        output = new float[1][labels.size()];
-        imgData = ByteBuffer.allocateDirect(4 * DIM_BATCH_SIZE * DIM_IMG_SIZE_X * DIM_IMG_SIZE_Y * DIM_PIXEL_SIZE);
-        imgData.order(ByteOrder.nativeOrder());
-        intValues = new int[DIM_IMG_SIZE_X * DIM_IMG_SIZE_Y];
-    }
-
-    private File getModelFile() throws IOException {
-        File file = new File(getApplicationContext().getFilesDir(), "test.tflite");
-        if(file.exists()) {
-            return file;
-        }
-        InputStream inputStream = this.getAssets().open(MODEL_PATH);
-        copyFile(inputStream, new FileOutputStream(file));
-        return file;
-    }
-
-    private void convertBitmapToByteBuffer(Bitmap bitmap) {
-        if (imgData == null) {
-            return;
-        }
-        imgData.rewind();
-        bitmap.getPixels(intValues, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
-        // Convert the image to floating point.
-
-        int pixel = 0;
-        for (int i = 0; i < DIM_IMG_SIZE_X; ++i) {
-            for (int j = 0; j < DIM_IMG_SIZE_Y; ++j) {
-                final int val = intValues[pixel++];
-                imgData.putFloat(((((val >> 16) & 0xFF)-IMAGE_MEAN)/IMAGE_STD));
-                imgData.putFloat(((((val >> 8) & 0xFF)-IMAGE_MEAN)/IMAGE_STD));
-                imgData.putFloat(((((val) & 0xFF)-IMAGE_MEAN)/IMAGE_STD));
-            }
-        }
-    }
-
-
-
-    private void copyFile(InputStream in, OutputStream out) throws IOException {
-        byte[] buffer = new byte[1024];
-        int read;
-        while((read = in.read(buffer)) != -1){
-            out.write(buffer, 0, read);
-        }
-    }
-
 
 }

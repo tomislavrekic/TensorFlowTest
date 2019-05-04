@@ -182,7 +182,7 @@ public class CameraActivity extends AppCompatActivity {
 
 
     public String createImageFromBitmap(Bitmap bitmap) {
-        String fileName = "TensorFlowTestImage";//no .png or .jpg needed
+        String fileName = Constants.TEMP_IMAGE_KEY ;//no .png or .jpg needed
         try {
             ByteArrayOutputStream bytes = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
