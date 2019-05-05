@@ -1,7 +1,7 @@
-package hr.ferit.rekca.tensorflowtest.DescriptionDb;
+package hr.ferit.tomislavrekic.tensorflowtest.DescriptionDb;
 
 
-import static hr.ferit.rekca.tensorflowtest.DescriptionDb.DescriptionContract.DescriptionEntry;
+import static hr.ferit.tomislavrekic.tensorflowtest.DescriptionDb.DescriptionContract.DescriptionEntry;
 
 public final class DescriptionDatabaseSQLCommands {
     public static final String SQL_CREATE_ENTRIES =

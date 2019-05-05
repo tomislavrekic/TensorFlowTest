@@ -1,4 +1,4 @@
-package hr.ferit.rekca.tensorflowtest;
+package hr.ferit.tomislavrekic.tensorflowtest;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -9,12 +9,12 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import static hr.ferit.rekca.tensorflowtest.Constants.DIM_BATCH_SIZE;
-import static hr.ferit.rekca.tensorflowtest.Constants.DIM_IMG_SIZE_X;
-import static hr.ferit.rekca.tensorflowtest.Constants.DIM_IMG_SIZE_Y;
-import static hr.ferit.rekca.tensorflowtest.Constants.DIM_PIXEL_SIZE;
-import static hr.ferit.rekca.tensorflowtest.Constants.IMAGE_MEAN;
-import static hr.ferit.rekca.tensorflowtest.Constants.IMAGE_STD;
+import static hr.ferit.tomislavrekic.tensorflowtest.Constants.DIM_BATCH_SIZE;
+import static hr.ferit.tomislavrekic.tensorflowtest.Constants.DIM_IMG_SIZE_X;
+import static hr.ferit.tomislavrekic.tensorflowtest.Constants.DIM_IMG_SIZE_Y;
+import static hr.ferit.tomislavrekic.tensorflowtest.Constants.DIM_PIXEL_SIZE;
+import static hr.ferit.tomislavrekic.tensorflowtest.Constants.IMAGE_MEAN;
+import static hr.ferit.tomislavrekic.tensorflowtest.Constants.IMAGE_STD;
 
 
     public class FetchImageTask extends AsyncTask<String, Void, ByteBuffer> {

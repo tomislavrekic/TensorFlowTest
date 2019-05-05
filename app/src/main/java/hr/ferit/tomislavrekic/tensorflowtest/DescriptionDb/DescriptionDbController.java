@@ -1,4 +1,4 @@
-package hr.ferit.rekca.tensorflowtest.DescriptionDb;
+package hr.ferit.tomislavrekic.tensorflowtest.DescriptionDb;
 
 import android.content.ContentValues;
 import android.content.Context;

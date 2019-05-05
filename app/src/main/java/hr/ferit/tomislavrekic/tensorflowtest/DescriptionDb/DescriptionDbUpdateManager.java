@@ -1,7 +1,6 @@
-package hr.ferit.rekca.tensorflowtest.DescriptionDb;
+package hr.ferit.tomislavrekic.tensorflowtest.DescriptionDb;
 
 import android.content.Context;
-import android.os.Environment;
 import android.util.Log;
 
 import java.io.File;

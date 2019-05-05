@@ -1,4 +1,4 @@
-package hr.ferit.rekca.tensorflowtest;
+package hr.ferit.tomislavrekic.tensorflowtest;
 
 public final class Constants {
     public static final String DF_NAME_KEY = "dbNameKey";
@@ -23,5 +23,7 @@ public final class Constants {
 
     public static final int IMAGE_MEAN = 128;
     public static final float IMAGE_STD = 128.0f;
+
+    public static final String BROADCAST_KEY1 = "hr.ferit.tomislavrekic.tensorflowtest.sendbroadcast1";
 
 }

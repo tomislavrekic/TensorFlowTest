@@ -1,4 +1,4 @@
-package hr.ferit.rekca.tensorflowtest.DescriptionDb;
+package hr.ferit.tomislavrekic.tensorflowtest.DescriptionDb;
 
 public class DescriptionDbSingleUnit {
     private String name;

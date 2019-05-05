@@ -1,24 +1,20 @@
-package hr.ferit.rekca.tensorflowtest;
+package hr.ferit.tomislavrekic.tensorflowtest;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import hr.ferit.rekca.tensorflowtest.DescriptionDb.DescriptionDbSingleUnit;
+import hr.ferit.tomislavrekic.tensorflowtest.DescriptionDb.DescriptionDbSingleUnit;
 
 public class DbListAdapter extends RecyclerView.Adapter<DbListAdapter.DbListViewHolder> {
     private List<DescriptionDbSingleUnit> mData;

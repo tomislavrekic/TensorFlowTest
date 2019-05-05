@@ -1,4 +1,4 @@
-package hr.ferit.rekca.tensorflowtest;
+package hr.ferit.tomislavrekic.tensorflowtest;
 
 public interface OnClickListener {
 

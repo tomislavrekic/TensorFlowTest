@@ -1,8 +1,7 @@
-package hr.ferit.rekca.tensorflowtest;
+package hr.ferit.tomislavrekic.tensorflowtest;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import org.tensorflow.lite.Interpreter;
 
@@ -76,6 +75,10 @@ public class Classifier {
         return guessedLabelIndex;
     }
 
+
+    public List<String> getLabels(){
+        return labels;
+    }
 
 
     private void initLabels(String labelFileName) {

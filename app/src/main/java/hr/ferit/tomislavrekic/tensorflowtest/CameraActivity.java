@@ -1,8 +1,9 @@
-package hr.ferit.rekca.tensorflowtest;
+package hr.ferit.tomislavrekic.tensorflowtest;
 
-import android.Manifest;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
@@ -14,12 +15,10 @@ import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.StreamConfigurationMap;
-import android.nfc.Tag;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.util.Size;
@@ -70,6 +69,7 @@ public class CameraActivity extends AppCompatActivity {
     Intent intent;
 
     Size[] testtest;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -147,6 +147,12 @@ public class CameraActivity extends AppCompatActivity {
             }
         };
     }
+    public void broadcastIntent(){
+        Intent intent = new Intent();
+        intent.setAction(Constants.BROADCAST_KEY1);
+        intent.setFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
+        sendBroadcast(intent);
+    }
 
     private void initListeners() {
         takePicture.setOnClickListener(new View.OnClickListener() {
@@ -164,6 +170,7 @@ public class CameraActivity extends AppCompatActivity {
                     }
                     finally {
                         unlock();
+                        broadcastIntent();
                         startActivityIfNeeded(intent,0);
                     }
                 }
