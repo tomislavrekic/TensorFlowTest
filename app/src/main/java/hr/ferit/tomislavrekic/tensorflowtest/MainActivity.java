@@ -74,17 +74,24 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onReceive(Context context, Intent intent) {
                 classifier();
-
-                try {
-                    unregisterReceiver(receiver);
-                }
-                catch (IllegalArgumentException e){
-                    e.printStackTrace();
-                }
             }
         };
+        receiverReg();
     }
 
+    public void receiverReg(){
+        registerReceiver(receiver,filter);
+    }
+    public void receiverUnreg(){
+        unregisterReceiver(receiver);
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_HOME);
+        startActivity(intent);
+    }
 
     private void initIntents() {
         intent = new Intent(this, CameraActivity.class);
@@ -107,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        registerReceiver(receiver,filter);
+        Log.d(TAG, "onResume: check");
 
         switchToCamera.setEnabled(true);
     }
@@ -116,7 +123,6 @@ public class MainActivity extends AppCompatActivity {
         switchToCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 try {
                     switchToCamera.setEnabled(false);
                     startActivityIfNeeded(intent,0);
@@ -141,6 +147,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
     public void classifier(){
+        Log.d(TAG, "classifier: check");
         inputImage = GetImage();
         displayImage(inputImage);
         displayLoading();
@@ -194,6 +201,14 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "onStop: check");
     }
 
+
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        receiverUnreg();
+    }
 
     class DeleteImageTask extends AsyncTask<Void,Void,Void>{
 

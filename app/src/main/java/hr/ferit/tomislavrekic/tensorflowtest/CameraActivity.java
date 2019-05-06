@@ -152,6 +152,7 @@ public class CameraActivity extends AppCompatActivity {
         intent.setAction(Constants.BROADCAST_KEY1);
         intent.setFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
         sendBroadcast(intent);
+        Log.d("Screen", "broadcastIntent: sent");
     }
 
     private void initListeners() {
